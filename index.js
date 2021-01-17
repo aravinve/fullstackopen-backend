@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+app.use(express.json())
 const PORT = 3001
 
 let persons = [
@@ -33,6 +34,45 @@ app.get('/api/persons', (req, res) => {
     res.json(persons)
 })
 
+app.get('/api/persons/:id', (req, res) => {
+    const paramId = Number(req.params.id)
+    const targetPerson = persons.find(person => person.id === paramId)
+    if(targetPerson){
+        res.json(targetPerson)
+    } else {
+        res.status(404).json({message: `Person with ID: ${paramId} not found!`}).end()
+    }
+})
+
+app.post('/api/persons', (req, res) => {
+    const {name, number} = req.body
+    if(name === undefined){
+        res.status(400).json({message: `Name is required!`}).end()
+        return
+    }
+    if(number === undefined){
+        res.status(400).json({message: `Number is required!`}).end()
+        return
+    }
+    if(validateName(name)){
+        res.status(400).json({message: `${name} already exists in phonebook`}).end()
+    } else {
+        const newData = {name, number, id: Math.floor(Math.random() * 100)}
+        persons = persons.concat(newData)
+        res.status(201).json({message: `${name} added to phonebook successfully`}).end()
+    }
+})
+
+app.delete('/api/persons/:id', (req, res) => {
+    const paramId = Number(req.params.id)
+    persons = persons.filter(person => person.id !== paramId)
+    res.status(204).end()
+})
+
 app.listen(PORT, () => {
     console.log(`Server Running on port ${PORT}`)
 })
+
+const validateName = (newName) => {
+    return persons.filter(person => person.name.toLowerCase() === newName.toLowerCase()).length > 0
+}
