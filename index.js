@@ -1,14 +1,18 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 const app = express()
 app.use(express.json())
+app.use(express.static('build'))
+app.use(cors())
 app.use(morgan((tokens, req, res) => {
+    const bodyData = JSON.stringify(req.body)
     return [
       tokens.method(req, res),
       tokens.url(req, res),
       tokens.status(req, res),
       tokens.res(req, res, 'content-length'), '-',
-      'BODY Data: ', JSON.stringify(req.body),
+      `BODY Data: ${bodyData}`,
       tokens['response-time'](req, res), 'ms'
     ].join(' ')
   }))
