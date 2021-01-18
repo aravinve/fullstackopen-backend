@@ -12,7 +12,7 @@ app.use(morgan((tokens, req, res) => {
       tokens['response-time'](req, res), 'ms'
     ].join(' ')
   }))
-const PORT = 3001
+
 
 let persons = [
     {
@@ -79,6 +79,8 @@ app.delete('/api/persons/:id', (req, res) => {
     persons = persons.filter(person => person.id !== paramId)
     res.status(204).end()
 })
+
+const PORT = process.env.PORT || 3001
 
 app.listen(PORT, () => {
     console.log(`Server Running on port ${PORT}`)
